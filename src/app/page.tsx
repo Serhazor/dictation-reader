@@ -557,9 +557,7 @@ export default function Page() {
         <h1>Dictation Reader</h1>
         <p>
           Paste plain text or simple semantic HTML, review the structure, then
-          play it back slowly with time-based progress. Built for dictation,
-          handwriting practice, and accessible reading without the usual
-          nonsense.
+          play it back slowly.
         </p>
       </header>
 

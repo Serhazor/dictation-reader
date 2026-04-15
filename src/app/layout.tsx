@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Dictation Reader",
-  description: "Structured dictation reader for slow, accessible playback.",
+  description: "Dictation reader for slow playback.",
 };
 
 export default function RootLayout({

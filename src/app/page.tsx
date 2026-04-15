@@ -227,9 +227,9 @@ function estimateBlockSeconds(
 }
 
 export default function Page() {
-  const [mounted, setMounted] = useState(false);
+  const [mounted, setMounted] = useState(true);
   const [rawInput, setRawInput] = useState(SAMPLE_HTML);
-  const [blocks, setBlocks] = useState<ContentBlock[]>([]);
+  const [blocks, setBlocks] = useState<ContentBlock[]>(() => parseInputToBlocks(SAMPLE_HTML));
   const [speedPercent, setSpeedPercent] = useState(70);
   const [defaultPauseSeconds, setDefaultPauseSeconds] = useState(3);
   const [announceHeadings, setAnnounceHeadings] = useState(true);
@@ -251,8 +251,7 @@ export default function Page() {
   const pausedElapsedRef = useRef(0);
 
   useEffect(() => {
-    setMounted(true);
-    setBlocks(parseInputToBlocks(SAMPLE_HTML));
+    // Component is mounted
   }, []);
 
   useEffect(() => {

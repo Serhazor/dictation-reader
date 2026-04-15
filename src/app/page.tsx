@@ -1,6 +1,5 @@
 "use client";
 
-import DOMPurify from "isomorphic-dompurify";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 type BlockType = "title" | "heading" | "subheading" | "paragraph" | "pause";
@@ -24,7 +23,6 @@ const SAMPLE_HTML = `<h1>Photosynthesis</h1>
 
 const SPEED_OPTIONS = [20, 30, 40, 50, 60, 70, 80, 90, 100];
 const PAUSE_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-
 const BASE_WPM = 150;
 
 function uid() {
@@ -43,10 +41,7 @@ function countWords(text: string) {
 }
 
 function sanitizeIncoming(input: string) {
-  return DOMPurify.sanitize(input, {
-    ALLOWED_TAGS: ["h1", "h2", "h3", "p", "br", "strong", "em"],
-    ALLOWED_ATTR: [],
-  });
+  return input;
 }
 
 function isProbablyHtml(input: string) {
@@ -114,6 +109,10 @@ function blocksFromPlainText(raw: string): ContentBlock[] {
 }
 
 function blocksFromHtml(rawHtml: string): ContentBlock[] {
+  if (typeof window === "undefined" || typeof DOMParser === "undefined") {
+    return blocksFromPlainText(rawHtml);
+  }
+
   const sanitized = sanitizeIncoming(rawHtml);
   const normalized = sanitized.replace(
     /\[\[pause:(\d{1,2})\]\]/gi,
@@ -228,10 +227,9 @@ function estimateBlockSeconds(
 }
 
 export default function Page() {
+  const [mounted, setMounted] = useState(false);
   const [rawInput, setRawInput] = useState(SAMPLE_HTML);
-  const [blocks, setBlocks] = useState<ContentBlock[]>(() =>
-    parseInputToBlocks(SAMPLE_HTML)
-  );
+  const [blocks, setBlocks] = useState<ContentBlock[]>([]);
   const [speedPercent, setSpeedPercent] = useState(70);
   const [defaultPauseSeconds, setDefaultPauseSeconds] = useState(3);
   const [announceHeadings, setAnnounceHeadings] = useState(true);
@@ -253,6 +251,13 @@ export default function Page() {
   const pausedElapsedRef = useRef(0);
 
   useEffect(() => {
+    setMounted(true);
+    setBlocks(parseInputToBlocks(SAMPLE_HTML));
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
     if (typeof window === "undefined" || !("speechSynthesis" in window)) {
       setError("This browser does not support speech synthesis.");
       return;
@@ -282,7 +287,7 @@ export default function Page() {
       if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
       if (tickRef.current) window.clearInterval(tickRef.current);
     };
-  }, [selectedVoice]);
+  }, [mounted, selectedVoice]);
 
   const totalEstimatedSeconds = useMemo(() => {
     let total = blocks.reduce((sum, block) => {
@@ -530,10 +535,7 @@ export default function Page() {
     speakFromIndex(newIndex);
   };
 
-  const updateBlock = (
-    id: string,
-    changes: Partial<ContentBlock>
-  ) => {
+  const updateBlock = (id: string, changes: Partial<ContentBlock>) => {
     setBlocks((prev) =>
       prev.map((block) => (block.id === id ? { ...block, ...changes } : block))
     );
@@ -587,6 +589,8 @@ export default function Page() {
                 onClick={() => {
                   setRawInput(SAMPLE_HTML);
                   setError("");
+                  setBlocks(parseInputToBlocks(SAMPLE_HTML));
+                  hardStop();
                 }}
               >
                 Load demo content

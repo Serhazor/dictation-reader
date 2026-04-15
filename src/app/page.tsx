@@ -1,6 +1,6 @@
 "use client";
 
-import DOMPurify from "dompurify";
+import DOMPurify from "isomorphic-dompurify";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 type BlockType = "title" | "heading" | "subheading" | "paragraph" | "pause";

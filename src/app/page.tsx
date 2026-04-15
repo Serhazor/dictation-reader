@@ -21,7 +21,7 @@ const SAMPLE_HTML = `<h1>Photosynthesis</h1>
 <h2>Why it matters</h2>
 <p>Photosynthesis is important because it supports most life on Earth.</p>`;
 
-const SPEED_OPTIONS = [20, 30, 40, 50, 60, 70, 80, 90, 100];
+const SPEED_OPTIONS = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 const PAUSE_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const BASE_WPM = 150;
 
